@@ -6,7 +6,7 @@ This exercise shows some important concepts that you should be aware about:
 - using authentication with web APIs
 - using offset when accessing web APIs
 
-To run this code locally you have to register at the NYTimes developer site 
+To run this code locally you have to register at the NYTimes developer site
 and get your own API key. You will be able to complete this exercise in our UI without doing so,
 as we have provided a sample result.
 
@@ -24,8 +24,7 @@ import requests
 
 URL_MAIN = "http://api.nytimes.com/svc/"
 URL_POPULAR = URL_MAIN + "mostpopular/v2/"
-API_KEY = { "popular": "",
-            "article": ""}
+API_KEY = {"popular": "9ef8bac80944d819bfebea857004d56b:1:74114679", "article": "cc7765ff8f456cb854a55da50891f28c:1:74114679"}
 
 
 def get_from_file(kind, period):
@@ -37,8 +36,16 @@ def get_from_file(kind, period):
 def article_overview(kind, period):
     data = get_from_file(kind, period)
     titles = []
-    urls =[]
     # YOUR CODE HERE
+    for news in data:
+        key = news["section"]
+        value = news["title"]
+        titles.append({key: value})
+
+    media = [news["media"] for news in data]
+    res = [y for x in media for y in x]
+    res = [x["media-metadata"] for x in res]
+    urls = [y["url"] for x in res for y in x if y["format"] == "Standard Thumbnail"]
 
     return (titles, urls)
 
@@ -53,7 +60,7 @@ def query_site(url, target, offset):
         print "See Intructor notes for information"
         return False
     params = {"api-key": API_KEY[target], "offset": offset}
-    r = requests.get(url, params = params)
+    r = requests.get(url, params=params)
 
     if r.status_code == requests.codes.ok:
         return r.json()
@@ -64,7 +71,7 @@ def query_site(url, target, offset):
 def get_popular(url, kind, days, section="all-sections", offset=0):
     # This function will construct the query according to the requirements of the site
     # and return the data, or print an error message if called incorrectly
-    if days not in [1,7,30]:
+    if days not in [1, 7, 30]:
         print "Time period can be 1,7, 30 days only"
         return False
     if kind not in ["viewed", "shared", "emailed"]:
@@ -82,12 +89,12 @@ def save_file(kind, period):
     # combine the data and then write all results in a file.
     data = get_popular(URL_POPULAR, "viewed", 1)
     num_results = data["num_results"]
+    print 'num of results ' + str(num_results)
     full_data = []
     with codecs.open("popular-{0}-{1}-full.json".format(kind, period), encoding='utf-8', mode='w') as v:
-        for offset in range(0, num_results, 20):        
+        for offset in range(0, num_results, 20):
             data = get_popular(URL_POPULAR, kind, period, offset=offset)
             full_data += data["results"]
-        
         v.write(json.dumps(full_data, indent=2))
 
 
