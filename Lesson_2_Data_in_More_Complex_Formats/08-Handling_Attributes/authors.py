@@ -18,15 +18,15 @@ def get_root(fname):
 def get_authors(root):
     authors = []
     for author in root.findall('./fm/bibl/aug/au'):
-        data = {
-                "fnm": None,
-                "snm": None,
-                "email": None,
-                "insr": []
-        }
-
-        # YOUR CODE HERE
-
+        data = {"fnm": author.find('fnm').text,
+                "snm": author.find('snm').text,
+                "email": author.find('email').text,
+                "insr": ""
+                }
+        insrList = []
+        for insrElement in author.findall('insr'):
+            insrList.append(insrElement.get('iid'))
+        data["insr"] = insrList
         authors.append(data)
 
     return authors
@@ -46,7 +46,7 @@ def test():
     data = get_authors(root)
 
     assert data[0] == solution[0]
-    assert data[1]["insr"] == solution[1]["insr"]
+    assert data[2]["insr"] == solution[2]["insr"]
 
 
 test()
