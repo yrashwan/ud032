@@ -5,21 +5,22 @@
 # All your changes should be in the 'extract_carrier' function
 # Also note that the html file is a stripped down version of what is actually on the website.
 
-# Your task in this exercise is to get list of all airlines. Exclude all of the combination
+# Your task in this exercise is to get a list of all airlines. Exclude all of the combination
 # values, like "All U.S. Carriers" from the data that you return.
 # You should return a list of codes for the carriers.
 
 from bs4 import BeautifulSoup
+import re
 html_page = "options.html"
-
 
 def extract_carriers(page):
     data = []
 
     with open(page, "r") as html:
         # do something here to find the necessary values
-        soup = BeautifulSoup(html)
-
+        soup = BeautifulSoup(html, "lxml")
+        for carrier in soup.findAll("option", value=re.compile("^[A-Z0-9]{2}$")):
+            data.append(carrier['value'])
     return data
 
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # All your changes should be in the 'extract_airports' function
 # It should return a list of airport codes, excluding any combinations like "All"
-
+import re
 from bs4 import BeautifulSoup
 html_page = "options.html"
 
@@ -11,8 +11,9 @@ def extract_airports(page):
     data = []
     with open(page, "r") as html:
         # do something here to find the necessary values
-        soup = BeautifulSoup(html)
-
+        soup = BeautifulSoup(html, 'lxml')
+        for airport in soup.findAll("option", value=re.compile("^[A-Z0-9]{3}$")):
+            data.append(airport['value'])
     return data
 
 
