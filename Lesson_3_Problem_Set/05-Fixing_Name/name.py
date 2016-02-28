@@ -12,18 +12,22 @@ of all the names. If there is only one name, the list with have only one item in
 the list should be empty.
 The rest of the code is just an example on how this function can be used
 """
-import codecs
 import csv
 import pprint
+import re
 
 CITIES = 'cities.csv'
 
 
 def fix_name(name):
-
-    # YOUR CODE HERE
-
-    return name
+    if str(name) == "NULL":
+        return []
+    if re.match('^{', name) is None:
+        return [str(name)]
+    ret = []
+    for word in re.findall('[^,{|}]+', name):
+        ret.append(word)
+    return ret
 
 
 def process_file(filename):

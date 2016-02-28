@@ -14,22 +14,49 @@ The audit_file function should return a dictionary containing fieldnames and the
 All the data initially is a string, so you have to do some checks on the values first.
 
 """
-import codecs
 import csv
-import json
 import pprint
+import re
+
 
 CITIES = 'cities.csv'
 
-FIELDS = ["name", "timeZone_label", "utcOffset", "homepage", "governmentType_label", "isPartOf_label", "areaCode", "populationTotal", 
-          "elevation", "maximumElevation", "minimumElevation", "populationDensity", "wgs84_pos#lat", "wgs84_pos#long", 
+FIELDS = ["name", "timeZone_label", "utcOffset", "homepage", "governmentType_label", "isPartOf_label", "areaCode", "populationTotal",
+          "elevation", "maximumElevation", "minimumElevation", "populationDensity", "wgs84_pos#lat", "wgs84_pos#long",
           "areaLand", "areaMetro", "areaUrban"]
+
+
+def getType(value):
+    if value is None or len(str(value)) == 0 or str(value) == "NULL":
+        return type(None)
+    if str(value)[0] == '{':
+        return type([])
+    if re.match('[0-9]+$', value):
+        return type(1)
+    try:
+        float(value)
+        return type(1.1)
+    except Exception:
+        pass
+    return type("")
+
 
 def audit_file(filename, fields):
     fieldtypes = {}
-
-    # YOUR CODE HERE
-
+    for key in FIELDS:
+        fieldtypes.update({key: set([])})
+    areaValues = set([])
+    toSkip = 3
+    cnt = 0
+    with open(filename, "r") as f:
+        reader = csv.DictReader(f, delimiter=",")
+        for row in reader:
+            if cnt < toSkip:
+                cnt += 1
+                continue
+            areaValues.add(row["areaMetro"])
+            for field in FIELDS:
+                fieldtypes[field].add(getType(row[field]))
 
     return fieldtypes
 
@@ -41,6 +68,6 @@ def test():
 
     assert fieldtypes["areaLand"] == set([type(1.1), type([]), type(None)])
     assert fieldtypes['areaMetro'] == set([type(1.1), type(None)])
-    
+
 if __name__ == "__main__":
     test()

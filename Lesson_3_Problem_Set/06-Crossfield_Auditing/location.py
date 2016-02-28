@@ -18,15 +18,19 @@ The rest of the code is just an example on how this function can be used.
 Changes to "process_file" function will not be take into account.
 """
 import csv
-import pprint
+import re
 
 CITIES = 'cities.csv'
+EPS = .000000000001
 
 
 def check_loc(point, lat, longi):
     # YOUR CODE HERE
-    
-    pass
+    m = re.findall('[^ ,]+', point)
+    print point
+    p1 = float(m[0])
+    p2 = float(m[1])
+    return abs(p1-float(lat)) < EPS and abs(p2-float(longi)) < EPS
 
 
 def process_file(filename):
